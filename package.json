@@ -1,0 +1,19 @@
+{
+    "name": "helloworld",
+    "main": "index.html",
+    "devDependencies": {
+        "nwjs-builder-phoenix": "^1.14.6"
+    },
+    "build": {
+        "nwVersion": "0.29.2"
+    },
+    "scripts": {
+        "dist": "build --tasks win-x86,win-x64,linux-x86,linux-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+        "start": "run ."
+    },
+    "window": {
+        "toolbar": true,
+        "width":1075,
+        "height":500
+    }
+}

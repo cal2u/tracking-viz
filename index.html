@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Context Menu</title>
+  <script src="./js/globals.js"></script>
+  <script src="./js/parser.js"></script>
+  <script src="./js/videoplayer.js"></script>
+  <script src="./js/videoselector.js"></script>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: row;
+      width:100%
+    }
+    canvas {
+      display: inline-block;
+    }
+    #frameCounter {
+      display: inline-block;
+      width: 200px;
+      font-family: sans-serif;
+    }
+    #slider {
+      width: 100%;
+    }
+    #videoSelector {
+      padding: 0em .8em;
+      font-size: 1em;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="videoPlayer" style = "min-width:auto;flex-grow:1">
+      <span id="frameCounter"></span><br>
+        <canvas id="canvas" width="400" height="400"></canvas>
+        <canvas id="canvas2" width="400" height="400"></canvas><br>
+      <input id="slider" type="range"></input>
+    </div>
+    <div style="flex-grow:0; flex-basis: 200px">
+      <label>Folder:<input id='folderSelector' type="file" nwdirectory></input></label>
+      <select id="videoSelector" size="15">
+      </select>
+    </div>
+  </div>
+<script>
+let b = '/Users/caleb/Projects/tracking/DETRAC-MOT-toolkit/DETRAC-Train-Images/MVI_20011';
+let annotationsFile = '/Users/caleb/Projects/iou-tracker/output';
+let annotations = parseAnnotations(annotationsFile, parseDPM)
+let annotationsFile2 = '/Users/caleb/Projects/tracking/DETRAC-MOT-toolkit/DETRAC-Train-Detections/DPM/MVI_20011_Det_DPM.txt'
+let annotations2 = parseAnnotations(annotationsFile2, parseDPM)
+
+let canvas = document.getElementById('canvas');
+let slider = document.getElementById('slider');
+let videoSelector = document.getElementById('videoSelector');
+let folderSelector = document.getElementById('folderSelector');
+
+let canvas2 = document.getElementById('canvas2');
+
+let vp2 = new VideoPlayer(canvas2, b, annotations2)
+
+let a = new VideoPlayer(canvas, b, annotations, frames => {
+  slider.min = 0;
+  slider.max = frames.length-1;
+  slider.oninput = (e => {
+    a.pauseVideo();
+    vp2.pauseVideo();
+    a.setFrame(parseInt(slider.value));
+    vp2.setFrame(parseInt(slider.value));
+    a.drawFrame();
+    vp2.drawFrame();
+  });
+
+  // Update function
+  let shownfps = Infinity
+  return (newFrame, fps) => {
+    let frameCounter = document.getElementById('frameCounter');
+    frameCounter.innerHTML = `frame: ${newFrame} fps: ${fps}`
+    if (newFrame % 10 == 0) {
+      slider.value = newFrame;
+      shownfps = fps;
+    }
+  }
+});
+
+let c = new VideoSelector(videoSelector, folderSelector, '/Users/caleb/Projects/tracking/DETRAC-MOT-toolkit/DETRAC-Train-Images/');
+
+</script>
+</body>
+</html>
